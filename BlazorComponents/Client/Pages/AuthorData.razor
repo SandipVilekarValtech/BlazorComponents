@@ -30,17 +30,17 @@ else
     </RadzenDataGrid>
 
     <div style="margin-top: 10px" class="row">
-
         <div class="col-md-4">
             <RadzenButton Disabled="@(this.Start == 0)" class="rz-paginator-first rz-paginator-element
                 " Icon="skip_previous" Click="@FirstPage">
             </RadzenButton>
             <RadzenButton Disabled="@(this.Start == 0)" Icon="" Text="<" Click="@PrevClick">
             </RadzenButton>
-            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)" Icon="" Text=">" style="margin-left: 20px" Click="@NextClick">
+            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)" Icon="" Text=">" 
+                style="margin-left: 20px" Click="@NextClick">
             </RadzenButton>
             <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)"
-                      class="rz-paginator-last rz-paginator-element " Icon="skip_next" Click="@LastPage">
+                class="rz-paginator-last rz-paginator-element " Icon="skip_next" Click="@LastPage">
             </RadzenButton>
         </div>
 
