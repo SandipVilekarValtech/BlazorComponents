@@ -19,7 +19,7 @@ namespace BlazorComponents.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAuthors(int skip = 0, int take = 5)
+        public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors(int skip = 0, int take = 5)
         {
             try
             {
@@ -31,6 +31,21 @@ namespace BlazorComponents.Server.Controllers
                     "Error fetching data");
             }
         }
+
+        //[HttpGet]
+        //public async Task<ActionResult> GetAuthors(int skip = 0, int take = 5)
+        //{
+        //    try
+        //    {
+        //        var result = await _authorRepository.GetAll(skip, take);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError,
+        //            "Error fetching data");
+        //    }
+        //}
 
         //[HttpGet]
         //public async Task<ActionResult> GetCount()

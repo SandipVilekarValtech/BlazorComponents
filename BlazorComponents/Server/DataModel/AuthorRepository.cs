@@ -19,24 +19,18 @@ namespace BlazorComponents.Server.DataModel
             var result = await _dbContext.Authors.Skip(skip).Take(take).ToListAsync();
             return result;
         }
+
+
         //public async Task<AuthorDataResult> GetAll(int skip = 0, int take = 5)
         //{
-        //    var result = (IEnumerable<AuthorDto>) await _dbContext.Authors.Skip(skip).Take(take).ToListAsync();
-
-        //    AuthorDataResult response = new AuthorDataResult()
+        //    AuthorDataResult authorDataResult = new AuthorDataResult()
         //    {
-        //        Authors = result,
+        //        Authors = _dbContext.Authors.Skip(skip).Take(take).ToList(),
         //        Count = await _dbContext.Authors.CountAsync()
         //    };
 
-        //    return response;
+        //    return authorDataResult;
         //}
-        //public async Task<int> GetCount()
-        //{
-        //    var result = await _dbContext.Authors.CountAsync();
-        //    return result;
-        //}
-
         public async Task<Author> GetAuthor(int id)
         {
             return await _dbContext.Authors.FirstOrDefaultAsync(a => a.Id == id);

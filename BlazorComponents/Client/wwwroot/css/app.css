@@ -62,3 +62,37 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+.rz-button, .rz-paginator-element {
+    -webkit-appearance: none;
+    display: inline-block;
+    border-radius: var(--rz-button-border-radius);
+    background-color: var(--rz-button-base-background-color);
+    color: var(--rz-button-base-color);
+    border: none;
+    outline: none;
+    line-height: var(--rz-button-line-height);
+    font-size: 1.0625rem;
+    text-decoration: none;
+    box-shadow: var(--rz-button-shadow);
+    transition: var(--rz-button-transition);
+    background-size: var(--rz-button-background-size);
+    background-repeat: no-repeat;
+}
+.rz-align-center .rz-paginator-first {
+    margin-left: auto;
+}
+
+.rz-button:not(.rz-state-disabled), .rz-paginator-element:not(.rz-state-disabled) {
+    cursor: pointer;
+}
+
+.rz-paginator-first, .rz-paginator-prev {
+    background-color: var(--rz-paginator-back-button-background-color);
+    color: var(--rz-paginator-back-button-color);
+    border-radius: var(--rz-paginator-button-border-radius);
+}
+
+.rz-paginator-first {
+    margin: var(--rz-paginator-first-button-margin);
+}

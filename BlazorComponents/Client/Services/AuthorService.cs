@@ -40,21 +40,27 @@ namespace BlazorComponents.Client.Services
                 throw;
             }
         }
-        //public async Task<int> GetCount()
+        //public async Task<AuthorDataResult> GetAll(int skip, int take)
         //{
         //    try
         //    {
-        //        var response = await _http.GetAsync($"api/Author");
-        //        //var headers = response.Headers;
-        //        string TotalRecords = string.Empty;
+        //        var response = await _http.GetAsync($"api/Author?skip={skip}&take={take}");
 
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+        //            {
+        //                AuthorDataResult result = new AuthorDataResult();
+        //                return result;
+        //            }
 
-        //        //if (headers.TryGetValues("TotalRecords", out IEnumerable<string> headerValue))
-        //        //{
-        //        //    TotalRecords = headerValue.FirstOrDefault();
-        //        //}
-
-        //        return Convert.ToInt32(response.Content.ToString());
+        //            return await response.Content.ReadFromJsonAsync<AuthorDataResult>();
+        //        }
+        //        else
+        //        {
+        //            var message = await response.Content.ReadAsStringAsync();
+        //            throw new Exception($"Http status code: {response.StatusCode} message: {message}");
+        //        }
         //    }
         //    catch (Exception)
         //    {

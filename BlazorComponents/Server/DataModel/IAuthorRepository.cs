@@ -6,7 +6,7 @@ namespace BlazorComponents.Server.DataModel
     {
         Task<IEnumerable<Author>> GetAll(int skip, int take);
         //Task<AuthorDataResult> GetAll(int skip, int take);
-        //Task<int> GetCount();
+        ////Task<int> GetCount();
         Task<IEnumerable<Author>> Search(string firstName);
         Task<Author> GetAuthor(int id);
         Task<Author> GetAuthorByEmail(string email);
