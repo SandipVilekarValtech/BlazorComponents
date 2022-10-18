@@ -30,20 +30,20 @@ else
     </RadzenDataGrid>
 
     <div style="margin-top: 10px" class="row">
-        
+
         <div class="col-md-4">
-            <RadzenButton class="rz-paginator-first rz-paginator-element  
+            <RadzenButton Disabled="@(this.Start == 0)" class="rz-paginator-first rz-paginator-element
                 " Icon="skip_previous" Click="@FirstPage">
             </RadzenButton>
             <RadzenButton Disabled="@(this.Start == 0)" Icon="" Text="<" Click="@PrevClick">
             </RadzenButton>
             <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)" Icon="" Text=">" style="margin-left: 20px" Click="@NextClick">
             </RadzenButton>
-            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)" 
-                class="rz-paginator-last rz-paginator-element " Icon="skip_next" Click="@LastPage">
+            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)"
+                      class="rz-paginator-last rz-paginator-element " Icon="skip_next" Click="@LastPage">
             </RadzenButton>
         </div>
-        
+
         <div class="col-md-4">
             <RadzenLabel Text="@($"Showing records from {this.Start+1} to {this.Start + this.PageSize} of {this.Count}")">
             </RadzenLabel>
@@ -58,6 +58,7 @@ else
 
 @code {
     public IEnumerable<AuthorDto> authors;
+    public AuthorDataResult authorsDataResult;
     protected RadzenDataGrid<AuthorDto> grid0;
     int _PageSize;
 
@@ -67,21 +68,21 @@ else
         Start = 0;
         Count = 0;
 
-        authors = await Task.Run(() => authorService.GetAll(Start, PageSize));
-        Count = 10000;//await Task.Run(() => authorService.GetCount());
+        authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
+        authors = authorsDataResult.Authors;
+        Count = authorsDataResult.Count;
     }
 
     protected async Task LoadData(int skip, int take)
     {
-        authors = await Task.Run(() => authorService.GetAll(skip, take));
-        //Count = authors.Count();
+        authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
+        authors = authorsDataResult.Authors;
+        Count = authorsDataResult.Count;
 
         await grid0.Reload();
 
         await InvokeAsync(() => { StateHasChanged(); });
     }
-
-    
 
     protected int PageSize
     {
@@ -128,24 +129,6 @@ else
             if (!object.Equals(_Count, value))
             {
                 _Count = value;
-                InvokeAsync(() => { StateHasChanged(); });
-            }
-        }
-    }
-
-    IEnumerable<AuthorDto> _authorDto;
-
-    protected IEnumerable<AuthorDto> getAuthorResult
-    {
-        get
-        {
-            return _authorDto;
-        }
-        set
-        {
-            if (!object.Equals(_authorDto, value))
-            {
-                _authorDto = value;
                 InvokeAsync(() => { StateHasChanged(); });
             }
         }

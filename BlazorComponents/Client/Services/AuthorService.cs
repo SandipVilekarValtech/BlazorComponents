@@ -13,34 +13,7 @@ namespace BlazorComponents.Client.Services
             _http = http;
         }
 
-        public async Task<IEnumerable<AuthorDto>> GetAll(int skip, int take)
-        {
-            try
-            {
-                var response = await _http.GetAsync($"api/Author?skip={skip}&take={take}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                    {
-                        return Enumerable.Empty<AuthorDto>();
-                    }
-
-                    return await response.Content.ReadFromJsonAsync<IEnumerable<AuthorDto>>();
-                }
-                else
-                {
-                    var message = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"Http status code: {response.StatusCode} message: {message}");
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-        //public async Task<AuthorDataResult> GetAll(int skip, int take)
+        //public async Task<IEnumerable<AuthorDto>> GetAll(int skip, int take)
         //{
         //    try
         //    {
@@ -50,11 +23,10 @@ namespace BlazorComponents.Client.Services
         //        {
         //            if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
         //            {
-        //                AuthorDataResult result = new AuthorDataResult();
-        //                return result;
+        //                return Enumerable.Empty<AuthorDto>();
         //            }
 
-        //            return await response.Content.ReadFromJsonAsync<AuthorDataResult>();
+        //            return await response.Content.ReadFromJsonAsync<IEnumerable<AuthorDto>>();
         //        }
         //        else
         //        {
@@ -68,6 +40,35 @@ namespace BlazorComponents.Client.Services
         //        throw;
         //    }
         //}
+        public async Task<AuthorDataResult> GetAll(int skip, int take)
+        {
+            try
+            {
+                var response = await _http.GetAsync($"api/Author?skip={skip}&take={take}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    {
+                        AuthorDataResult result = new AuthorDataResult();
+                        return result;
+                    }
+
+                    //return await response.Content.ReadFromJsonAsync<AuthorDataResult>();
+                    return await response.Content.ReadFromJsonAsync<AuthorDataResult>();
+                }
+                else
+                {
+                    var message = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Http status code: {response.StatusCode} message: {message}");
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public Task<AuthorDto> GetAuthor(int id)
         {
             throw new NotImplementedException();
