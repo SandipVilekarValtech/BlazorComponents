@@ -14,13 +14,7 @@ namespace BlazorComponents.Server.DataModel
         {
             _dbContext = dbContext;
         }
-        //public async Task<IEnumerable<Author>> GetAll(int skip = 0, int take = 5)
-        //{
-        //    var result = await _dbContext.Authors.Skip(skip).Take(take).ToListAsync();
-        //    return result;
-        //}
-
-
+        
         public async Task<AuthorDataResult> GetAll(int skip = 0, int take = 5)
         {
             AuthorDataResult authorDataResult = new AuthorDataResult()
@@ -30,6 +24,10 @@ namespace BlazorComponents.Server.DataModel
             };
 
             return authorDataResult;
+        }
+        public async Task<IEnumerable<Author>> GetAllAuthors()
+        {
+            return await _dbContext.Authors.ToListAsync();
         }
         public async Task<Author> GetAuthor(int id)
         {
