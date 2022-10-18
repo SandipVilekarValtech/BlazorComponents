@@ -1,0 +1,184 @@
+﻿@page "/author"
+@using BlazorComponents.Shared
+@inject IAuthorService authorService
+<PageTitle>Authors</PageTitle>
+
+<h1>Authors</h1>
+
+@if (authors == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    
+    <RadzenGrid Data="@getAuthorResult"
+                TItem="AuthorDto"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                FilterMode="FilterMode.Advanced"
+                AllowSorting="true"
+                AllowPaging="false"
+                Count="@Count"
+                @ref="grid0"
+                PageSize="@PageSize"
+                
+                >
+        <Columns>
+            <RadzenGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
+            <RadzenGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
+            <RadzenGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
+
+        </Columns>
+    </RadzenGrid>
+
+    <div style="margin-top: 10px" class="row">
+        <div class="col-md-4">
+            <RadzenButton Disabled="@(this.Start == 0)" Icon="skip_previous" Click="@Button1Click">
+            </RadzenButton>
+            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)" Icon="skip_next" style="margin-left: 20px" Click="@Button2Click">
+            </RadzenButton>
+        </div>
+        <div class="col-md-4">
+            <RadzenLabel Text="@($"Showing records from {this.Start} to {this.Start + this.PageSize} of {this.Count}")">
+            </RadzenLabel>
+        </div>
+        <div class="col-md-4" style="vertical-align: baseline">
+            <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" style="float: right; width: 60px" @bind-Value="@(this.PageSize)" Name="Dropdown0" Change="@Dropdown0Change">
+            </RadzenDropDown>
+        </div>
+    </div>
+}
+
+@code {
+    public IEnumerable<AuthorDto> authors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        //authors = await Task.Run(() => authorService.GetAll(0, 5));
+
+        await Load();
+        //Query q = new Query();
+        //q.Skip = 0;
+        //await authorService.Gettest(q);
+    }
+
+
+    protected RadzenGrid<AuthorDto> grid0;
+    int _PageSize;
+
+    protected int PageSize
+    {
+        get
+        {
+            return _PageSize;
+        }
+        set
+        {
+            if (!object.Equals(_PageSize, value))
+            {
+                _PageSize = value;
+                InvokeAsync(() => { StateHasChanged(); });
+            }
+        }
+    }
+
+    int _Start;
+    protected int Start
+    {
+        get
+        {
+            return _Start;
+        }
+        set
+        {
+            if (!object.Equals(_Start, value))
+            {
+                _Start = value;
+                InvokeAsync(() => { StateHasChanged(); });
+            }
+        }
+    }
+
+    int _Count;
+    protected int Count
+    {
+        get
+        {
+            return _Count;
+        }
+        set
+        {
+            if (!object.Equals(_Count, value))
+            {
+                _Count = value;
+                InvokeAsync(() => { StateHasChanged(); });
+            }
+        }
+    }
+
+    IEnumerable<AuthorDto> _authorDto = null;
+
+    protected IEnumerable<AuthorDto> getAuthorResult
+    {
+        get
+        {
+            return _authorDto;
+        }
+        set
+        {
+            if (!object.Equals(_authorDto, value))
+            {
+                _authorDto = value;
+                InvokeAsync(() => { StateHasChanged(); });
+            }
+        }
+    }
+
+
+    protected async Task Load()
+    {
+        PageSize = 10;
+
+        Start = 0;
+
+        Count = 0;
+    }
+
+    //protected async Task Grid0LoadData(LoadDataArgs args)
+    //{
+    //    //authors = await Task.Run(() => authorService.GetAll(0, 5));
+
+    //    var authorResult = await authorService.GetAll(new Query() { Filter = $@"{args.Filter}", OrderBy = $"{args.OrderBy}", Top = PageSize, Skip = Start });
+
+    //    getAuthorResult = authorResult;
+
+    //    var result = await authorService.GetAll(new Query() { Filter = $@"{args.Filter}" });
+    //    Count = result.Count();
+    //}
+
+    protected async Task Button1Click(MouseEventArgs args)
+    {
+        if (this.Start - this.PageSize >= 0)
+        {
+            Start = this.Start - this.PageSize;
+        }
+
+        grid0.Reload();
+    }
+
+    protected async System.Threading.Tasks.Task Button2Click(MouseEventArgs args)
+    {
+        if (this.Start + this.PageSize <= this.Count - this.PageSize)
+        {
+            Start = this.Start + this.PageSize;
+        }
+
+        grid0.Reload();
+    }
+
+    protected async System.Threading.Tasks.Task Dropdown0Change(dynamic args)
+    {
+        grid0.Reload();
+    }
+}
