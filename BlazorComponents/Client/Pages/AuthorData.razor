@@ -28,6 +28,14 @@ else
 
         </Columns>
     </RadzenDataGrid>
+    <RadzenPager 
+        ShowPagingSummary="true" 
+        PagingSummaryFormat="@pagingSummaryFormat" 
+        HorizontalAlign="HorizontalAlign.Right" 
+        Count="@Count" 
+        PageSize="@PageSize" 
+        PageNumbersCount="5" 
+        PageChanged="@PageChanged" />
 
     <div style="margin-top: 10px" class="row">
         <div class="col-md-4">
@@ -57,6 +65,7 @@ else
 }
 
 @code {
+    string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
     public IEnumerable<AuthorDto> authors;
     public AuthorDataResult authorsDataResult;
     protected RadzenDataGrid<AuthorDto> grid0;
@@ -72,10 +81,13 @@ else
         authors = authorsDataResult.Authors;
         Count = authorsDataResult.Count;
     }
-
+    async void PageChanged(PagerEventArgs args)
+    {
+        await LoadData(args.Skip, args.Top);
+    }
     protected async Task LoadData(int skip, int take)
     {
-        authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
+        authorsDataResult = await Task.Run(() => authorService.GetAll(skip, take));
         authors = authorsDataResult.Authors;
         Count = authorsDataResult.Count;
 
