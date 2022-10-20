@@ -37,25 +37,7 @@ else
         PageNumbersCount="5" 
         PageChanged="@PageChanged" />
 
-    <div style="margin-top: 10px" class="row">
-        <div class="col-md-4">
-            <RadzenButton Disabled="@(this.Start == 0)" class="rz-paginator-first rz-paginator-element
-                " Icon="skip_previous" Click="@FirstPage">
-            </RadzenButton>
-            <RadzenButton Disabled="@(this.Start == 0)" Icon="" Text="<" Click="@PrevClick">
-            </RadzenButton>
-            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)" Icon="" Text=">" 
-                style="margin-left: 20px" Click="@NextClick">
-            </RadzenButton>
-            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)"
-                class="rz-paginator-last rz-paginator-element " Icon="skip_next" Click="@LastPage">
-            </RadzenButton>
-        </div>
-
-        <div class="col-md-4">
-            <RadzenLabel Text="@($"Showing records from {this.Start+1} to {this.Start + this.PageSize} of {this.Count}")">
-            </RadzenLabel>
-        </div>
+    <div style="margin-top: -45px; margin-left: 200px;" class="row">
         <div class="col-md-4" style="vertical-align: baseline">
             <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" style="float: right; width: 60px" @bind-Value="@(this.PageSize)"
                         Name="Dropdown0" Change="@Dropdown0Change">
@@ -65,7 +47,7 @@ else
 }
 
 @code {
-    string pagingSummaryFormat = "Displaying page {0} of {1} (total {2} records)";
+    string pagingSummaryFormat = "Page {0} of {1} (total {2} records)";
     public IEnumerable<AuthorDto> authors;
     public AuthorDataResult authorsDataResult;
     protected RadzenDataGrid<AuthorDto> grid0;
@@ -148,20 +130,12 @@ else
 
     protected async Task PrevClick(MouseEventArgs args)
     {
-        //if (this.Start - this.PageSize >= 0)
-        //{
-        //    Start = this.Start - this.PageSize;
-        //}
         Start = this.Start - this.PageSize;
         await LoadData(Start, PageSize);
     }
 
     protected async Task NextClick(MouseEventArgs args)
     {
-        //if (this.Start + this.PageSize <= this.Count - this.PageSize)
-        //{
-        //    Start = this.Start + this.PageSize;
-        //}
         Start = this.Start + this.PageSize;
         await LoadData(Start, PageSize);
     }
