@@ -3,50 +3,66 @@
 @inject IAuthorService authorService
 <PageTitle>Authors</PageTitle>
 
-<h3>Radzen Datagrid Server-side Pagination</h3>
-
+<h5>Radzen Datagrid Server-side Pagination</h5>
+<hr />
 @if (authors == null)
 {
     <p>Loading...</p>
 }
 else
 {
-    <RadzenDataGrid Data="@authors"
-                TItem="AuthorDto"
-                AllowFiltering="true"
-                AllowColumnResize="true"
-                FilterMode="FilterMode.Advanced"
-                AllowSorting="true"
-                AllowPaging="false"
-                Count="@Count"
-                @ref="@grid0"
-                PageSize="@PageSize">
-        <Columns>
-            <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
-            <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
-            <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
 
-        </Columns>
-    </RadzenDataGrid>
-    <RadzenPager 
-        ShowPagingSummary="true" 
-        PagingSummaryFormat="@pagingSummaryFormat" 
-        HorizontalAlign="HorizontalAlign.Right" 
-        Count="@Count" 
-        PageSize="@PageSize" 
-        PageNumbersCount="5" 
-        PageChanged="@PageChanged" />
+    <div class="card">
+        <div class="card-header">
+            Search Authors
 
-    <div style="margin-top: -45px; margin-left: 200px;" class="row">
-        <div class="col-md-4" style="vertical-align: baseline">
-            <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" style="float: right; width: 60px" @bind-Value="@(this.PageSize)"
-                        Name="Dropdown0" Change="@Dropdown0Change">
-            </RadzenDropDown>
+            <div class="card-body">
+                <RadzenTextBox Placeholder="Search" Class="w-100" />
+            </div>
+            <div class="card-body">
+                <RadzenDatePicker style="width: auto;" Name="BirthDate" @bind-Value=@dateNow DateFormat="d" />
+            </div>
+            <div class="card-body">
+                <RadzenButton Text="Search" />
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <RadzenDataGrid Data="@authors"
+                                TItem="AuthorDto" AllowFiltering="true"
+                                AllowColumnResize="true" FilterMode="FilterMode.Advanced"
+                                AllowSorting="true" AllowPaging="false"
+                                Count="@Count" @ref="@grid0" PageSize="@PageSize">
+                        <Columns>
+                            <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
+                            <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
+                            <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
+                        </Columns>
+                    </RadzenDataGrid>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <RadzenPager ShowPagingSummary="true"
+                                     PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Right"
+                                     Count="@Count" PageSize="@PageSize"
+                                     PageNumbersCount="5" PageChanged="@PageChanged" />
+                        </div>
+                        <div class="col-sm-6">
+                            PageSize: <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" @bind-Value="@(this.PageSize)"
+                                                  Name="Dropdown0" Change="@Dropdown0Change" Style="top: 10px;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 }
 
 @code {
+    DateTime? dateNow = DateTime.Now;
     string pagingSummaryFormat = "Page {0} of {1} (total {2} records)";
     public IEnumerable<AuthorDto> authors;
     public AuthorDataResult authorsDataResult;
