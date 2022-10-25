@@ -53,17 +53,5 @@ namespace BlazorComponents.Server.DataModel
         {
             return await _dbContext.Authors.FirstOrDefaultAsync(a => a.Email == email);
         }
-
-        public async Task<IEnumerable<Author>> Search(string firstName)
-        {
-            IQueryable<Author> query = _dbContext.Authors;
-
-            if (!string.IsNullOrEmpty(firstName))
-            {
-                query = query.Where(a => a.FirstName.Contains(firstName));
-            }
-
-            return await query.ToListAsync();
-        }
     }
 }
