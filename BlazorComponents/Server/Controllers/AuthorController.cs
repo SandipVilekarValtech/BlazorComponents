@@ -48,6 +48,21 @@ namespace BlazorComponents.Server.Controllers
             }
         }
 
+        [HttpGet("Search")]
+        public async Task<ActionResult<DataModel.AuthorDataResult>> Search(string filter, int skip = 0, int take = 5)
+        {
+            try
+            {
+                var result = await _authorRepository.Search(filter, skip, take);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error fetching data");
+            }
+        }
+
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Author>> GetAuthor(int id)
         {

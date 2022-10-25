@@ -6,6 +6,7 @@ namespace BlazorComponents.Client.Services
     {
         Task<IEnumerable<AuthorDto>> GetAllAuthors();
         Task<AuthorDataResult> GetAll(int skip, int take);
+        Task<AuthorDataResult> Search(string filter, int skip, int take);
         Task<IEnumerable<AuthorDto>> Search(string firstName);
         Task<AuthorDto> GetAuthor(int id);
         Task<AuthorDto> GetAuthorByEmail(string email);

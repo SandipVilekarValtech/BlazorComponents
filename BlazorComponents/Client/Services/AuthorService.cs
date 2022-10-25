@@ -41,6 +41,35 @@ namespace BlazorComponents.Client.Services
                 throw;
             }
         }
+
+        public async Task<AuthorDataResult> Search(string filter, int skip, int take)
+        {
+            try
+            {
+                var response = await _http.GetAsync($"api/Author/Search?filter={filter}&skip={skip}&take={take}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    {
+                        AuthorDataResult result = new AuthorDataResult();
+                        return result;
+                    }
+
+                    return await response.Content.ReadFromJsonAsync<AuthorDataResult>();
+                }
+                else
+                {
+                    var message = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Http status code: {response.StatusCode} message: {message}");
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         public async Task<IEnumerable<AuthorDto>> GetAllAuthors()
         {
             try

@@ -17,13 +17,14 @@ else
             Search Authors
 
             <div class="card-body">
-                <RadzenTextBox Placeholder="Search" Class="w-100" />
+                <RadzenTextBox @bind-Value=@filterText Placeholder="Search" Class="w-100" />
             </div>
             <div class="card-body">
                 <RadzenDatePicker style="width: auto;" Name="BirthDate" @bind-Value=@dateNow DateFormat="d" />
             </div>
             <div class="card-body">
-                <RadzenButton Text="Search" />
+                <RadzenButton Text="Search" Click="@Search" />
+                <RadzenButton Text="Reset" Click="@Reset" />
             </div>
         </div>
     </div>
@@ -62,6 +63,8 @@ else
 }
 
 @code {
+    bool getFiltered = false;
+    string filterText = "";
     DateTime? dateNow = DateTime.Now;
     string pagingSummaryFormat = "Page {0} of {1} (total {2} records)";
     public IEnumerable<AuthorDto> authors;
@@ -85,11 +88,17 @@ else
     }
     protected async Task LoadData(int skip, int take)
     {
-        authorsDataResult = await Task.Run(() => authorService.GetAll(skip, take));
-        authors = authorsDataResult.Authors;
-        Count = authorsDataResult.Count;
+        if (!getFiltered)
+        {
+            authorsDataResult = await Task.Run(() => authorService.GetAll(skip, take));
+        }
+        else
+        {
+            authorsDataResult = await Task.Run(() => authorService.Search(filterText, skip, take));
+        }
 
-        await grid0.Reload();
+        authors = authorsDataResult.Authors;
+        Count = authorsDataResult.Count; await grid0.Reload();
 
         await InvokeAsync(() => { StateHasChanged(); });
     }
@@ -167,6 +176,19 @@ else
     }
     protected async Task Dropdown0Change(dynamic args)
     {
+        await LoadData(Start, PageSize);
+    }
+    protected async Task Search()
+    {
+        getFiltered = true;
+
+        await LoadData(Start, PageSize);
+    }
+    protected async Task Reset()
+    {
+        getFiltered = false;
+        filterText = "";
+        Start = 0;
         await LoadData(Start, PageSize);
     }
 }
