@@ -42,11 +42,11 @@ namespace BlazorComponents.Client.Services
             }
         }
 
-        public async Task<AuthorDataResult> Search(string filter, int skip, int take)
+        public async Task<AuthorDataResult> Search(string filter, DateTime? filterDate, int skip, int take)
         {
             try
             {
-                var response = await _http.GetAsync($"api/Author/Search?filter={filter}&skip={skip}&take={take}");
+                var response = await _http.GetAsync($"api/Author/Search?filter={filter}&filterDate={filterDate}&skip={skip}&take={take}");
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -49,11 +49,11 @@ namespace BlazorComponents.Server.Controllers
         }
 
         [HttpGet("Search")]
-        public async Task<ActionResult<DataModel.AuthorDataResult>> Search(string filter, int skip = 0, int take = 5)
+        public async Task<ActionResult<DataModel.AuthorDataResult>> Search(string filter, DateTime? filterDate, int skip = 0, int take = 5)
         {
             try
             {
-                var result = await _authorRepository.Search(filter, skip, take);
+                var result = await _authorRepository.Search(filter, filterDate, skip, take);
                 return Ok(result);
             }
             catch (Exception)

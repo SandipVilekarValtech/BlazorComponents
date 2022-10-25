@@ -96,7 +96,7 @@ else
         }
         else
         {
-            authorsDataResult = await Task.Run(() => authorService.Search(filterText, skip, take));
+            authorsDataResult = await Task.Run(() => authorService.Search(filterText, dateNow, skip, take));
         }
 
         authors = authorsDataResult.Authors;
@@ -190,6 +190,7 @@ else
     {
         getFiltered = false;
         filterText = "";
+        dateNow = DateTime.Now;
         Start = 0;
         await LoadData(Start, PageSize);
     }

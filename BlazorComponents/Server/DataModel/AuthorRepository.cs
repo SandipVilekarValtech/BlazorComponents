@@ -25,12 +25,13 @@ namespace BlazorComponents.Server.DataModel
 
             return authorDataResult;
         }
-        public async Task<AuthorDataResult> Search(string filter, int skip = 0, int take = 5)
+        public async Task<AuthorDataResult> Search(string filter, DateTime? filterDate, int skip = 0, int take = 5)
         {
             var filteredAuthors = _dbContext.Authors.Where(x =>
             (x.FirstName.ToLower().Contains(filter.ToLower())) ||
             (x.LastName.ToLower().Contains(filter.ToLower())) ||
-            (x.Email.ToLower().Contains(filter.ToLower())));
+            (x.Email.ToLower().Contains(filter.ToLower())) ||
+            (x.Birthdate == filterDate));
 
             AuthorDataResult authorDataResult = new AuthorDataResult()
             {
