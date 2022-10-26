@@ -20,7 +20,7 @@ else
                 <RadzenTextBox @bind-Value=@filterText Placeholder="Search" Class="w-50" />
             </div>
             <div class="card-body">
-                <RadzenDatePicker style="width: auto;" Name="BirthDate" @bind-Value=@dateNow DateFormat="d" />
+                <RadzenDatePicker style="width: auto;" Name="BirthDate" @bind-Value=@dateNow DateFormat="dd-MM-yyyy" />
             </div>
             <div class="card-body">
                 <RadzenButton Text="Search" Click="@Search" />
@@ -42,8 +42,8 @@ else
                             <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
                             <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
                             <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
-                            <RadzenDataGridColumn TItem="AuthorDto" Property="Birthdate" Title="Birthdate" 
-                              Type="typeof(DateTime)" FormatString="{0:d}" />
+                            <RadzenDataGridColumn TItem="AuthorDto" Property="Birthdate" Title="Birthdate"
+                                              Type="typeof(DateTime)" FormatString="{0:dd-MM-yyyy}" Width="8%" />
                         </Columns>
                     </RadzenDataGrid>
                     <div class="row">
