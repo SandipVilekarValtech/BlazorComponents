@@ -1,4 +1,5 @@
 ﻿using BlazorComponents.Shared;
+using Radzen;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -18,6 +19,34 @@ namespace BlazorComponents.Client.Services
             try
             {
                 var response = await _http.GetAsync($"api/Author?skip={skip}&take={take}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    {
+                        AuthorDataResult result = new AuthorDataResult();
+                        return result;
+                    }
+
+                    return await response.Content.ReadFromJsonAsync<AuthorDataResult>();
+                }
+                else
+                {
+                    var message = await response.Content.ReadAsStringAsync();
+                    throw new Exception($"Http status code: {response.StatusCode} message: {message}");
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        public async Task<AuthorDataResult> GridSearch(string filterText, DateTime? filterDate, string filter, string orderBy, int skip, int take)
+        {
+            try
+            {
+                var response = await _http.GetAsync($"api/Author/GridSearch?filterText={filterText}&filterDate={filterDate}&filter={filter}&orderBy={orderBy}&skip={skip}&take={take}");
 
                 if (response.IsSuccessStatusCode)
                 {

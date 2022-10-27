@@ -36,7 +36,7 @@ else
                     <RadzenDataGrid Data="@authors"
                                 TItem="AuthorDto" AllowFiltering="true"
                                 AllowColumnResize="true" FilterMode="FilterMode.Advanced"
-                                AllowSorting="true" AllowPaging="false"
+                                AllowSorting="true" AllowPaging="false" LoadData="@Grid0LoadData"
                                 Count="@Count" @ref="@grid0" PageSize="@PageSize">
                         <Columns>
                             <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
@@ -65,14 +65,18 @@ else
 }
 
 @code {
-    bool getFiltered = false;
-    string filterText = "";
+
     DateTime? dateNow = DateTime.Now;
     string pagingSummaryFormat = "Page {0} of {1} (total {2} records)";
     public IEnumerable<AuthorDto> authors;
     public AuthorDataResult authorsDataResult;
     protected RadzenDataGrid<AuthorDto> grid0;
     int _PageSize;
+
+    bool getFiltered = false;
+    string filterText = "";
+    string orderby = "0";
+    string filter = "f";
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,11 +104,30 @@ else
         }
 
         authors = authorsDataResult.Authors;
-        Count = authorsDataResult.Count; await grid0.Reload();
+        Count = authorsDataResult.Count;
+        //await grid0.Reload();
 
         await InvokeAsync(() => { StateHasChanged(); });
     }
+    protected async Task Grid0LoadData(LoadDataArgs args)
+    {
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            orderby = args.OrderBy;
+        }
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            filter = args.Filter;
+        }
 
+        authorsDataResult = await Task.Run(() => authorService.GridSearch(string.IsNullOrEmpty(filterText) ? "f" : filterText, dateNow, filter, orderby, Convert.ToInt32(args.Skip), Convert.ToInt32(args.Top)));
+
+        authors = authorsDataResult.Authors;
+        Count = authorsDataResult.Count;
+        //await grid0.Reload();
+
+        //await InvokeAsync(() => { StateHasChanged(); });
+    }
     protected int PageSize
     {
         get
@@ -184,7 +207,15 @@ else
     {
         getFiltered = true;
 
-        await LoadData(Start, PageSize);
+        ////await LoadData(Start, PageSize);
+
+        //LoadDataArgs loadDataArgs = new LoadDataArgs()
+        //    {
+        //        Skip = Start,
+        //        Top = PageSize
+        //    };
+        //await Grid0LoadData(loadDataArgs);
+        await grid0.Reload();
     }
     protected async Task Reset()
     {
@@ -192,6 +223,7 @@ else
         filterText = "";
         dateNow = DateTime.Now;
         Start = 0;
-        await LoadData(Start, PageSize);
+        //await LoadData(Start, PageSize);
+        await grid0.Reload();
     }
 }

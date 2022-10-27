@@ -47,6 +47,20 @@ namespace BlazorComponents.Server.Controllers
                     "Error fetching data");
             }
         }
+        [HttpGet("GridSearch")]
+        public async Task<ActionResult<DataModel.AuthorDataResult>> GridSearch(string filterText, DateTime? filterDate, string filter, string orderBy, int skip = 0, int take = 5)
+        {
+            try
+            {
+                var result = await _authorRepository.GridSearch(filterText, filterDate, filter, orderBy, skip, take);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error fetching data");
+            }
+        }
 
         [HttpGet("Search")]
         public async Task<ActionResult<DataModel.AuthorDataResult>> Search(string filter, DateTime? filterDate, int skip = 0, int take = 5)

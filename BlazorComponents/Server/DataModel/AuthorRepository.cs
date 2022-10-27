@@ -1,8 +1,10 @@
 ﻿using BlazorComponents.Shared;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Text;
 
 namespace BlazorComponents.Server.DataModel
 {
@@ -21,6 +23,64 @@ namespace BlazorComponents.Server.DataModel
             {
                 Authors = _dbContext.Authors.Skip(skip).Take(take).ToList(),
                 Count = await _dbContext.Authors.CountAsync()
+            };
+
+            return authorDataResult;
+        }
+
+        public async Task<AuthorDataResult> GridSearch(string filterText, DateTime? filterDate, string filter, string orderBy, int skip = 0, int take = 5)
+        {
+            var items = _dbContext.Authors.AsQueryable();
+
+            StringBuilder query = new StringBuilder();
+
+            if (filterText != "f")
+            {
+                query.Append(" (FirstName == null ? \"\" : FirstName.ToLower()).Contains(\"");
+                query.Append(filterText);
+                query.Append("\")");
+
+                query.Append(" OR (LastName == null ? \"\" : LastName.ToLower()).Contains(\"");
+                query.Append(filterText.ToLower());
+                query.Append("\")");
+
+                query.Append(" OR (Email == null ? \"\" : Email.ToLower()).Contains(\"");
+                query.Append(filterText.ToLower());
+                query.Append("\")");
+
+                query.Append(" OR Birthdate = DateTime(\"");
+                query.Append(filterDate.Value.ToString("yyyy/MM/dd"));
+                query.Append("\")");
+            }
+
+            if (filter != "f")
+            {
+                query.Append(query.Length > 0 ? " OR (" + filter + " )" : filter);
+            }
+
+            items = items.Where(query.ToString());
+
+            /*if (!(filterText == "f"))
+            {
+                items = items.Where(x =>
+                                    (x.FirstName.ToLower().Contains(filterText.ToLower())) ||
+                                    (x.LastName.ToLower().Contains(filterText.ToLower())) ||
+                                    (x.Email.ToLower().Contains(filterText.ToLower())) ||
+                                    (x.Birthdate == filterDate));
+            }*/
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                items = items.OrderBy(orderBy);
+            }
+
+            var count = items.Count();
+            items = items.Skip(skip).Take(take);
+
+            AuthorDataResult authorDataResult = new AuthorDataResult()
+            {
+                Authors = items.ToList(),
+                Count = count
             };
 
             return authorDataResult;
