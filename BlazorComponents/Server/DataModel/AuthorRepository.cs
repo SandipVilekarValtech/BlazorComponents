@@ -30,13 +30,14 @@ namespace BlazorComponents.Server.DataModel
 
         public async Task<AuthorDataResult> GridSearch(string filterText, DateTime? filterDate, string filter, string orderBy, int skip = 0, int take = 5)
         {
-            var items = _dbContext.Authors.AsQueryable();
-
+            //var items = _dbContext.Authors.AsQueryable();
+            IQueryable<Author> authors = Enumerable.Empty<Author>().AsQueryable();
+            var count = 0;
             StringBuilder query = new StringBuilder();
 
             if (filterText != "f")
             {
-                query.Append(" (FirstName == null ? \"\" : FirstName.ToLower()).Contains(\"");
+                query.Append(" ((FirstName == null ? \"\" : FirstName.ToLower()).Contains(\"");
                 query.Append(filterText);
                 query.Append("\")");
 
@@ -46,40 +47,48 @@ namespace BlazorComponents.Server.DataModel
 
                 query.Append(" OR (Email == null ? \"\" : Email.ToLower()).Contains(\"");
                 query.Append(filterText.ToLower());
-                query.Append("\")");
+                query.Append("\"))");
+            }
 
-                query.Append(" OR Birthdate = DateTime(\"");
+            if (filterDate != null)
+            {
+                if (query.Length > 0)
+                {
+                    query.Append(" AND (Birthdate = DateTime(\""); 
+                }
+                else
+                {
+                    query.Append(" (Birthdate = DateTime(\"");
+                }
+                
                 query.Append(filterDate.Value.ToString("yyyy/MM/dd"));
-                query.Append("\")");
+                query.Append("\"))");
             }
 
             if (filter != "f")
             {
-                query.Append(query.Length > 0 ? " OR (" + filter + " )" : filter);
+                query.Append(query.Length > 0 ? " AND (" + filter + " )" : filter);
             }
 
-            items = items.Where(query.ToString());
-
-            /*if (!(filterText == "f"))
+            if (query.Length > 0)
             {
-                items = items.Where(x =>
-                                    (x.FirstName.ToLower().Contains(filterText.ToLower())) ||
-                                    (x.LastName.ToLower().Contains(filterText.ToLower())) ||
-                                    (x.Email.ToLower().Contains(filterText.ToLower())) ||
-                                    (x.Birthdate == filterDate));
-            }*/
+                //items = items.Where(query.ToString());
 
-            if (!string.IsNullOrEmpty(orderBy))
-            {
-                items = items.OrderBy(orderBy);
+                authors = _dbContext.Authors.Where(query.ToString());
+                count = await authors.CountAsync();
+                authors = authors.OrderBy(orderBy).Skip(skip).Take(take);
             }
 
-            var count = items.Count();
-            items = items.Skip(skip).Take(take);
+            if (count == 0)
+            {
+                authors = _dbContext.Authors.OrderBy(orderBy).Skip(skip).Take(take);
+                count = await _dbContext.Authors.CountAsync();
+            }
+            
 
             AuthorDataResult authorDataResult = new AuthorDataResult()
             {
-                Authors = items.ToList(),
+                Authors = authors.ToList(),
                 Count = count
             };
 
