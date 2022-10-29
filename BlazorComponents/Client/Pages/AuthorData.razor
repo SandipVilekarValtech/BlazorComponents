@@ -20,6 +20,7 @@ else
                 <RadzenTextBox @bind-Value=@filterText Placeholder="Search by FirstName OR LastName OR Email" Class="w-50" />
                 <RadzenDatePicker Placeholder="Search by Birthdate" style="width: auto;" Name="BirthDate" @bind-Value=@dateNow DateFormat="dd-MM-yyyy" />
                 <RadzenButton Text="Search" Click="@Search" /><RadzenButton Text="Reset" Click="@Reset" />
+
             </div>
         </div>
     </div>
@@ -28,29 +29,41 @@ else
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
-                    <RadzenDataGrid Data="@authors"
-                                TItem="AuthorDto" AllowFiltering="true"
-                                AllowColumnResize="true" FilterMode="FilterMode.Advanced"
-                                AllowSorting="true" AllowPaging="false" LoadData="@Grid0LoadData"
-                                Count="@Count" @ref="@grid0" PageSize="@PageSize">
-                        <Columns>
-                            <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
-                            <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
-                            <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
-                            <RadzenDataGridColumn TItem="AuthorDto" Property="Birthdate" Title="Birth date"
-                                              Type="typeof(DateTime)" FormatString="{0:dd-MM-yyyy}" Width="10%" />
-                        </Columns>
-                    </RadzenDataGrid>
+                    <div class="row" Style="min-height:410px;">
+                        <RadzenDataGrid Data="@authors" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    TItem="AuthorDto" AllowFiltering="true" PagerPosition="PagerPosition.Bottom"
+                                    AllowColumnResize="true" FilterMode="FilterMode.Advanced"
+                                    AllowSorting="true" AllowPaging="false" LoadData="@Grid0LoadData"
+                                    Count="@Count" @ref="@grid0" PageSize="@PageSize">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
+                                <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
+                                <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
+                                <RadzenDataGridColumn TItem="AuthorDto" Property="Birthdate" Title="Birth date"
+                                                  Type="typeof(DateTime)" FormatString="{0:dd-MM-yyyy}" Width="10%" />
+                            </Columns>
+                        </RadzenDataGrid>
+                    </div>
                     <div class="row">
-                        <div class="col-sm-10">
+                        <div class="col-sm-7">
                             <RadzenPager ShowPagingSummary="true"
                                      PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Center"
                                      Count="@Count" PageSize="@PageSize"
                                      PageNumbersCount="5" PageChanged="@PageChanged" />
                         </div>
                         <div class="col-sm-2 rz-paginator-summary">
-                            PageSize: <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" @bind-Value="@(this.PageSize)"
+                            Page Size: <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" @bind-Value="@(this.PageSize)"
                                                   Name="Dropdown0" Change="@Dropdown0Change" Style="width: 50px;top: 10px;" />
+                        </div>
+                        <div class="col-sm-3 rz-paginator-summary">          
+                            Filter Operator: <RadzenRadioButtonList @bind-Value=@LogicalFilterOp
+                                               TValue="int"
+                                               Change=@((args) => OnChange(args))>
+                                <Items>
+                                    <RadzenRadioButtonListItem Text="AND" Value="0" />
+                                    <RadzenRadioButtonListItem Text="OR" Value="1" />
+                                </Items>
+                            </RadzenRadioButtonList>
                         </div>
                     </div>
                 </div>
@@ -60,6 +73,7 @@ else
 }
 
 @code {
+    int LogicalFilterOp = 0;
     DateTime? dateNow = null;// DateTime.Now;
     string pagingSummaryFormat = "Page {0} of {1} (total {2} records)";
     public IEnumerable<AuthorDto> authors;
@@ -82,6 +96,20 @@ else
         authors = authorsDataResult.Authors;
         Count = authorsDataResult.Count;
     }
+
+    void OnChange(int value)
+    {
+        if (value == 0)
+        {
+            grid0.LogicalFilterOperator = LogicalFilterOperator.And;
+        }
+        else
+        {
+            grid0.LogicalFilterOperator = LogicalFilterOperator.Or;
+        }
+        InvokeAsync(() => { StateHasChanged(); });
+    }
+
     async void PageChanged(PagerEventArgs args)
     {
         //await LoadData(args.Skip, args.Top);
@@ -178,7 +206,7 @@ else
             }
         }
     }
-    
+
     protected async Task Dropdown0Change(dynamic args)
     {
         //await LoadData(Start, PageSize);
