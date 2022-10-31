@@ -78,12 +78,15 @@ namespace BlazorComponents.Server.DataModel
                 count = await authors.CountAsync();
                 authors = authors.OrderBy(orderBy).Skip(skip).Take(take);
             }
-
-            if (count == 0)
+            else
             {
-                authors = _dbContext.Authors.OrderBy(orderBy).Skip(skip).Take(take);
-                count = await _dbContext.Authors.CountAsync();
-            }
+
+                if (count == 0)
+                {
+                    authors = _dbContext.Authors.OrderBy(orderBy).Skip(skip).Take(take);
+                    count = await _dbContext.Authors.CountAsync();
+                }
+            }           
             
 
             AuthorDataResult authorDataResult = new AuthorDataResult()

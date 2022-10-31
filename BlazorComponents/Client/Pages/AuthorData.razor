@@ -1,6 +1,7 @@
 ﻿@page "/authordata"
 @using BlazorComponents.Shared
 @inject IAuthorService authorService
+@inject NotificationService NotificationService
 <PageTitle>Authors</PageTitle>
 
 <h5>Radzen Datagrid Server-side Pagination</h5>
@@ -52,15 +53,15 @@ else
                                      PageNumbersCount="5" PageChanged="@PageChanged" />
                         </div>
                         <div class="col-sm-2 rz-paginator-summary" style="white-space:nowrap;">
-                            Page Size: <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" @bind-Value="@(this.PageSize)"                                                 
-                                                    Name="Dropdown0" Change="@Dropdown0Change" Style="width: 50px; top:10px;" />
-                            
+                            Page Size: <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" @bind-Value="@(this.PageSize)"
+                                                   Name="Dropdown0" Change="@Dropdown0Change" Style="width: 50px; top:10px;" />
+
                         </div>
                         <div class="col-sm-2 rz-paginator-summary" style="white-space:nowrap; padding-top:10px;">
-                                Filter: <RadzenSelectBar @bind-Value="@FO" TextProperty="Text" ValueProperty="Value"
-                                                     Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(o => new { Text = $"{o}", Value = o }))"
-                                                     Size="ButtonSize.Small" />
-                            </div>
+                            Filter: <RadzenSelectBar @bind-Value="@FO" TextProperty="Text" ValueProperty="Value"
+                                                 Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(o => new { Text = $"{o}", Value = o }))"
+                                                 Size="ButtonSize.Small" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,6 +78,7 @@ else
     public AuthorDataResult authorsDataResult;
     protected RadzenDataGrid<AuthorDto> grid0;
     int _PageSize;
+    bool pagechanged = false;
 
     bool getFiltered = false;
     string filterText = "";
@@ -101,10 +103,13 @@ else
                 Skip = args.Skip,
                 Top = args.Top
             };
+        pagechanged = true;
         await Grid0LoadData(lArgs);
     }
     protected async Task LoadData(int skip, int take)
     {
+        grid0.IsLoading = true;
+
         if (!getFiltered)
         {
             authorsDataResult = await Task.Run(() => authorService.GetAll(skip, take));
@@ -116,13 +121,13 @@ else
 
         authors = authorsDataResult.Authors;
         Count = authorsDataResult.Count;
-        //await grid0.Reload();
+
+        grid0.IsLoading = false;
 
         await InvokeAsync(() => { StateHasChanged(); });
     }
     protected async Task Grid0LoadData(LoadDataArgs args)
     {
-        
         grid0.IsLoading = true;
 
         if (!string.IsNullOrEmpty(args.OrderBy))
@@ -138,9 +143,19 @@ else
 
         authors = authorsDataResult.Authors;
         Count = authorsDataResult.Count;
-        //await grid0.Reload();
 
         grid0.IsLoading = false;
+
+        if (!pagechanged)
+        {
+            ShowNotification(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Info,
+                    Summary = "",
+                    Detail = " Found " + Count.ToString() + " records",
+                    Duration = 4000
+                });
+        }
         await InvokeAsync(() => { StateHasChanged(); });
     }
     protected int PageSize
@@ -195,7 +210,6 @@ else
 
     protected async Task Dropdown0Change(dynamic args)
     {
-        //await LoadData(Start, PageSize);
         LoadDataArgs lArgs = new LoadDataArgs()
             {
                 Skip = Start,
@@ -206,14 +220,17 @@ else
     protected async Task Search()
     {
         getFiltered = true;
-
-        //await LoadData(Start, PageSize);
         LoadDataArgs lArgs = new LoadDataArgs()
             {
                 Skip = Start,
                 Top = PageSize
             };
+        pagechanged = false;
         await Grid0LoadData(lArgs);
+    }
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
     }
     protected async Task Reset()
     {
@@ -221,12 +238,10 @@ else
         filterText = "";
         dateNow = null;
         Start = 0;
-        //await LoadData(Start, PageSize);
-        //await grid0.Reload();
+        pagechanged = false;
 
         Count = 0;
         grid0.Reset();
-        await grid0.Reload();
 
         filter = "f";
         authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
