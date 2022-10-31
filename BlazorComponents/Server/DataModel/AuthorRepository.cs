@@ -21,7 +21,7 @@ namespace BlazorComponents.Server.DataModel
         {
             AuthorDataResult authorDataResult = new AuthorDataResult()
             {
-                Authors = _dbContext.Authors.Skip(skip).Take(take).ToList(),
+                Authors = _dbContext.Authors.OrderBy("FirstName").Skip(skip).Take(take).ToList(),
                 Count = await _dbContext.Authors.CountAsync()
             };
 
@@ -30,7 +30,6 @@ namespace BlazorComponents.Server.DataModel
 
         public async Task<AuthorDataResult> GridSearch(string filterText, DateTime? filterDate, string filter, string orderBy, int skip = 0, int take = 5)
         {
-            //var items = _dbContext.Authors.AsQueryable();
             IQueryable<Author> authors = Enumerable.Empty<Author>().AsQueryable();
             var count = 0;
             StringBuilder query = new StringBuilder();

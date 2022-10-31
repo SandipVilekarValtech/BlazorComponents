@@ -42,7 +42,7 @@ else
                                 <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
                                 <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
                                 <RadzenDataGridColumn TItem="AuthorDto" Property="Birthdate" Title="Birth date"
-                                                  Type="typeof(DateTime)" FormatString="{0:dd-MM-yyyy}" Width="10%" />
+                                                  Type="typeof(DateTime)" FormatString="{0:dd-MM-yyyy}" Width="8%" />
                             </Columns>
                         </RadzenDataGrid>
                     </div>
@@ -85,7 +85,7 @@ else
 
     bool getFiltered = false;
     string filterText = "";
-    string orderby = "0";
+    string orderby = "FirstName";
     string filter = "f";
 
     async void OnRefreshClick()
@@ -251,9 +251,9 @@ else
         grid0.Reset();
 
         filter = "f";
-        authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
-        authors = authorsDataResult.Authors;
-        Count = authorsDataResult.Count;
+        //authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
+        //authors = authorsDataResult.Authors;
+        //Count = authorsDataResult.Count;
 
         await grid0.Reload();
     }
