@@ -140,6 +140,9 @@ else
     }
     protected async Task Grid0LoadData(LoadDataArgs args)
     {
+        filter = "f";
+        grid0.IsLoading = true;
+
         if (!string.IsNullOrEmpty(args.OrderBy))
         {
             orderby = args.OrderBy;
@@ -155,6 +158,7 @@ else
         Count = authorsDataResult.Count;
         //await grid0.Reload();
 
+        grid0.IsLoading = false;
         await InvokeAsync(() => { StateHasChanged(); });
     }
     protected int PageSize
@@ -238,11 +242,15 @@ else
         //await LoadData(Start, PageSize);
         //await grid0.Reload();
 
-        LoadDataArgs lArgs = new LoadDataArgs()
-            {
-                Skip = Start,
-                Top = PageSize
-            };
-        await Grid0LoadData(lArgs);
+        Count = 0;
+        grid0.Reset();
+        await grid0.Reload();   
+
+        filter = "";
+        authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
+        authors = authorsDataResult.Authors;
+        Count = authorsDataResult.Count;
+
+        await grid0.Reload();
     }
 }
