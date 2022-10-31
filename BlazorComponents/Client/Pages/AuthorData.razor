@@ -32,7 +32,7 @@ else
                     <div class="row" Style="min-height:410px;">
                         <RadzenDataGrid Data="@authors" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                     TItem="AuthorDto" AllowFiltering="true" PagerPosition="PagerPosition.Bottom"
-                                    AllowColumnResize="true" FilterMode="FilterMode.Advanced"
+                                    AllowColumnResize="true" FilterMode="FilterMode.Advanced" Density="Density.Default" LogicalFilterOperator="@FO"
                                     AllowSorting="true" AllowPaging="false" LoadData="@Grid0LoadData"
                                     Count="@Count" @ref="@grid0" PageSize="@PageSize">
                             <Columns>
@@ -45,26 +45,22 @@ else
                         </RadzenDataGrid>
                     </div>
                     <div class="row">
-                        <div class="col-sm-7">
+                        <div class="col-sm-8">
                             <RadzenPager ShowPagingSummary="true"
                                      PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Center"
                                      Count="@Count" PageSize="@PageSize"
                                      PageNumbersCount="5" PageChanged="@PageChanged" />
                         </div>
-                        <div class="col-sm-2 rz-paginator-summary">
-                            Page Size: <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" @bind-Value="@(this.PageSize)"
-                                                  Name="Dropdown0" Change="@Dropdown0Change" Style="width: 50px;top: 10px;" />
+                        <div class="col-sm-2 rz-paginator-summary" style="white-space:nowrap;">
+                            Page Size: <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" @bind-Value="@(this.PageSize)"                                                 
+                                                    Name="Dropdown0" Change="@Dropdown0Change" Style="width: 50px; top:10px;" />
+                            
                         </div>
-                        <div class="col-sm-3 rz-paginator-summary">          
-                            Filter Operator: <RadzenRadioButtonList @bind-Value=@LogicalFilterOp
-                                               TValue="int"
-                                               Change=@((args) => OnChange(args))>
-                                <Items>
-                                    <RadzenRadioButtonListItem Text="AND" Value="0" />
-                                    <RadzenRadioButtonListItem Text="OR" Value="1" />
-                                </Items>
-                            </RadzenRadioButtonList>
-                        </div>
+                        <div class="col-sm-2 rz-paginator-summary" style="white-space:nowrap; padding-top:10px;">
+                                Filter: <RadzenSelectBar @bind-Value="@FO" TextProperty="Text" ValueProperty="Value"
+                                                     Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(o => new { Text = $"{o}", Value = o }))"
+                                                     Size="ButtonSize.Small" />
+                            </div>
                     </div>
                 </div>
             </div>
@@ -73,7 +69,8 @@ else
 }
 
 @code {
-    int LogicalFilterOp = 0;
+    LogicalFilterOperator FO = LogicalFilterOperator.Or;
+
     DateTime? dateNow = null;// DateTime.Now;
     string pagingSummaryFormat = "Page {0} of {1} (total {2} records)";
     public IEnumerable<AuthorDto> authors;
@@ -97,23 +94,8 @@ else
         Count = authorsDataResult.Count;
     }
 
-    void OnChange(int value)
-    {
-        if (value == 0)
-        {
-            grid0.LogicalFilterOperator = LogicalFilterOperator.And;
-        }
-        else
-        {
-            grid0.LogicalFilterOperator = LogicalFilterOperator.Or;
-        }
-        InvokeAsync(() => { StateHasChanged(); });
-    }
-
     async void PageChanged(PagerEventArgs args)
     {
-        //await LoadData(args.Skip, args.Top);
-
         LoadDataArgs lArgs = new LoadDataArgs()
             {
                 Skip = args.Skip,
@@ -140,7 +122,7 @@ else
     }
     protected async Task Grid0LoadData(LoadDataArgs args)
     {
-        filter = "f";
+        
         grid0.IsLoading = true;
 
         if (!string.IsNullOrEmpty(args.OrderBy))
@@ -244,9 +226,9 @@ else
 
         Count = 0;
         grid0.Reset();
-        await grid0.Reload();   
+        await grid0.Reload();
 
-        filter = "";
+        filter = "f";
         authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
         authors = authorsDataResult.Authors;
         Count = authorsDataResult.Count;
