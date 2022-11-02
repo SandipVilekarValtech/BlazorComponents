@@ -17,7 +17,7 @@ else
         <div class="card-header">
             Search Authors
 
-            <div class="card-body">
+            <div class="rz-shadow-1 card-body">
                 <RadzenTextBox @bind-Value=@filterText Placeholder="Search by FirstName OR LastName OR Email" Class="w-50" />
                 <RadzenDatePicker Placeholder="Search by Birthdate" style="width: auto;" Name="BirthDate" @bind-Value=@dateNow DateFormat="dd-MM-yyyy" />
                 <RadzenButton Image="images/search2.png" Text="Search" Click="@Search" ButtonStyle="ButtonStyle.Light" /><RadzenButton Text="Reset" Click="@Reset" Icon="refresh" ButtonStyle="ButtonStyle.Light" />
@@ -29,7 +29,7 @@ else
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
-                <div class="card-body">
+                <div class="rz-shadow-10 card-body">
                     <div class="row" Style="min-height:410px;">
                         <RadzenDataGrid Data="@authors" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                     TItem="AuthorDto" AllowFiltering="true" PagerPosition="PagerPosition.Bottom"
@@ -46,7 +46,7 @@ else
                             </Columns>
                         </RadzenDataGrid>
                     </div>
-                    <div class="row">
+                    <div class="rz-shadow-1 row">
                         <div class="col-sm-8">
                             <RadzenPager ShowPagingSummary="true"
                                      PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Center"
@@ -63,7 +63,7 @@ else
                                                  Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(o => new { Text = $"{o}", Value = o }))"
                                                  Size="ButtonSize.Small" />
 
-                            <RadzenButton Click=@(args => @OnRefreshClick()) Icon="refresh" ButtonStyle="ButtonStyle.Light" /> 
+                            <RadzenButton Click=@(args => @OnRefreshClick()) class="rz-ripple" Icon="refresh" ButtonStyle="ButtonStyle.Light" /> 
                         </div>
                     </div>
                 </div>
