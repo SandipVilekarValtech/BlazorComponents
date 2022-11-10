@@ -5,7 +5,7 @@ namespace BlazorComponents.Server.DataModel;
 
 public partial class Author
 {
-    public short Id { get; set; }
+    public Int32 Id { get; set; }
 
     public string FirstName { get; set; } = null!;
 

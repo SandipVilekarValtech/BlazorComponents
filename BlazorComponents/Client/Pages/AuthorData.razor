@@ -1,88 +1,170 @@
 ﻿@page "/authordata"
 @using BlazorComponents.Shared
 @inject IAuthorService authorService
+@inject NotificationService NotificationService
 <PageTitle>Authors</PageTitle>
 
-<h1>Authors</h1>
-
+<h5 class="rz-shadow-4">Radzen Datagrid Server-side Pagination</h5>
+<hr />
 @if (authors == null)
 {
     <p>Loading...</p>
 }
 else
 {
-    <RadzenDataGrid Data="@authors"
-                TItem="AuthorDto"
-                AllowFiltering="true"
-                AllowColumnResize="true"
-                FilterMode="FilterMode.Advanced"
-                AllowSorting="true"
-                AllowPaging="false"
-                Count="@Count"
-                @ref="@grid0"
-                PageSize="@PageSize">
-        <Columns>
-            <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
-            <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
-            <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
 
-        </Columns>
-    </RadzenDataGrid>
+    <div class="rz-shadow-1 card">
+        <div class="card-header">
+            Search Authors
 
-    <div style="margin-top: 10px" class="row">
-        
-        <div class="col-md-4">
-            <RadzenButton class="rz-paginator-first rz-paginator-element  
-                " Icon="skip_previous" Click="@FirstPage">
-            </RadzenButton>
-            <RadzenButton Disabled="@(this.Start == 0)" Icon="" Text="<" Click="@PrevClick">
-            </RadzenButton>
-            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)" Icon="" Text=">" style="margin-left: 20px" Click="@NextClick">
-            </RadzenButton>
-            <RadzenButton Disabled="@(this.Start >= this.Count - this.PageSize)" 
-                class="rz-paginator-last rz-paginator-element " Icon="skip_next" Click="@LastPage">
-            </RadzenButton>
+            <div class="card-body">
+                <RadzenTextBox @bind-Value=@filterText Placeholder="Search by FirstName OR LastName OR Email" Class="w-50" />
+                <RadzenDatePicker Placeholder="Search by Birthdate" style="width: auto;" Name="BirthDate" @bind-Value=@dateNow DateFormat="dd-MM-yyyy" />
+                <RadzenButton Image="images/search2.png" Text="Search" Click="@Search" ButtonStyle="ButtonStyle.Light" /><RadzenButton Text="Reset" Click="@Reset" Icon="refresh" ButtonStyle="ButtonStyle.Light" />
+
+            </div>
         </div>
-        
-        <div class="col-md-4">
-            <RadzenLabel Text="@($"Showing records from {this.Start+1} to {this.Start + this.PageSize} of {this.Count}")">
-            </RadzenLabel>
-        </div>
-        <div class="col-md-4" style="vertical-align: baseline">
-            <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" style="float: right; width: 60px" @bind-Value="@(this.PageSize)"
-                        Name="Dropdown0" Change="@Dropdown0Change">
-            </RadzenDropDown>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="rz-shadow-5 card-body">
+                    <div class="row" Style="min-height:410px;">
+                        <RadzenDataGrid Data="@authors" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                    TItem="AuthorDto" AllowFiltering="true" PagerPosition="PagerPosition.Bottom"
+                                    AllowColumnResize="true" FilterMode="FilterMode.Advanced" Density="Density.Default" 
+                                    LogicalFilterOperator="@FO"
+                                    AllowSorting="true" AllowPaging="false" LoadData="@Grid0LoadData"
+                                    Count="@Count" @ref="@grid0" PageSize="@PageSize">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
+                                <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
+                                <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
+                                <RadzenDataGridColumn TItem="AuthorDto" Property="Birthdate" Title="Birth date"
+                                                  Type="typeof(DateTime)" FormatString="{0:dd-MM-yyyy}" Width="8%" />
+                            </Columns>
+                        </RadzenDataGrid>
+                    </div>
+                    <div class="rz-shadow-1 row">
+                        <div class="col-sm-8">
+                            <RadzenPager ShowPagingSummary="true"
+                                     PagingSummaryFormat="@pagingSummaryFormat" HorizontalAlign="HorizontalAlign.Center"
+                                     Count="@Count" PageSize="@PageSize"
+                                     PageNumbersCount="5" PageChanged="@PageChanged" />
+                        </div>
+                        <div class="col-sm-2 rz-paginator-summary" style="white-space:nowrap;">
+                            Page Size: <RadzenDropDown Data="@(new int[]{10,20,30,40,50})" @bind-Value="@(this.PageSize)"
+                                                   Name="Dropdown0" Change="@Dropdown0Change" Style="width: 50px; top:10px;" />
+
+                        </div>
+                        <div class="col-sm-2 rz-paginator-summary" style="white-space:nowrap; padding-top:10px;">
+                            Filter: <RadzenSelectBar @bind-Value="@FO" TextProperty="Text" ValueProperty="Value"
+                                                 Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(o => new { Text = $"{o}", Value = o }))"
+                                                 Size="ButtonSize.Small" />
+
+                            <RadzenButton Click=@(args => @OnRefreshClick()) class="rz-ripple" Icon="refresh" ButtonStyle="ButtonStyle.Light" /> 
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 }
 
 @code {
+    LogicalFilterOperator FO = LogicalFilterOperator.Or;
+
+    DateTime? dateNow = null;// DateTime.Now;
+    string pagingSummaryFormat = "Page {0} of {1} (total {2} records)";
     public IEnumerable<AuthorDto> authors;
+    public AuthorDataResult authorsDataResult;
     protected RadzenDataGrid<AuthorDto> grid0;
     int _PageSize;
+    bool pagechanged = false;
 
+    bool getFiltered = false;
+    string filterText = "";
+    string orderby = "FirstName";
+    string filter = "f";
+
+    async void OnRefreshClick()
+    {
+        await grid0.Reload();
+    }
     protected override async Task OnInitializedAsync()
     {
         PageSize = 10;
         Start = 0;
         Count = 0;
 
-        authors = await Task.Run(() => authorService.GetAll(Start, PageSize));
-        Count = 10000;//await Task.Run(() => authorService.GetCount());
+        authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
+        authors = authorsDataResult.Authors;
+        Count = authorsDataResult.Count;
     }
 
+    async void PageChanged(PagerEventArgs args)
+    {
+        LoadDataArgs lArgs = new LoadDataArgs()
+            {
+                Skip = args.Skip,
+                Top = args.Top
+            };
+        pagechanged = true;
+        await Grid0LoadData(lArgs);
+    }
     protected async Task LoadData(int skip, int take)
     {
-        authors = await Task.Run(() => authorService.GetAll(skip, take));
-        //Count = authors.Count();
+        grid0.IsLoading = true;
 
-        await grid0.Reload();
+        if (!getFiltered)
+        {
+            authorsDataResult = await Task.Run(() => authorService.GetAll(skip, take));
+        }
+        else
+        {
+            authorsDataResult = await Task.Run(() => authorService.Search(filterText, dateNow, skip, take));
+        }
+
+        authors = authorsDataResult.Authors;
+        Count = authorsDataResult.Count;
+
+        grid0.IsLoading = false;
 
         await InvokeAsync(() => { StateHasChanged(); });
     }
+    protected async Task Grid0LoadData(LoadDataArgs args)
+    {
+        grid0.IsLoading = true;
 
-    
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            orderby = args.OrderBy;
+        }
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            filter = args.Filter;
+        }
 
+        authorsDataResult = await Task.Run(() => authorService.GridSearch(string.IsNullOrEmpty(filterText) ? "f" : filterText, dateNow, filter, orderby, Convert.ToInt32(args.Skip), Convert.ToInt32(args.Top)));
+
+        authors = authorsDataResult.Authors;
+        Count = authorsDataResult.Count;
+
+        grid0.IsLoading = false;
+
+        if (!pagechanged)
+        {
+            ShowNotification(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Info,
+                    Summary = "",
+                    Detail = " Found " + Count.ToString() + " records",
+                    Duration = 4000
+                });
+        }
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
     protected int PageSize
     {
         get
@@ -133,55 +215,46 @@ else
         }
     }
 
-    IEnumerable<AuthorDto> _authorDto;
-
-    protected IEnumerable<AuthorDto> getAuthorResult
-    {
-        get
-        {
-            return _authorDto;
-        }
-        set
-        {
-            if (!object.Equals(_authorDto, value))
-            {
-                _authorDto = value;
-                InvokeAsync(() => { StateHasChanged(); });
-            }
-        }
-    }
-
-    protected async Task PrevClick(MouseEventArgs args)
-    {
-        //if (this.Start - this.PageSize >= 0)
-        //{
-        //    Start = this.Start - this.PageSize;
-        //}
-        Start = this.Start - this.PageSize;
-        await LoadData(Start, PageSize);
-    }
-
-    protected async Task NextClick(MouseEventArgs args)
-    {
-        //if (this.Start + this.PageSize <= this.Count - this.PageSize)
-        //{
-        //    Start = this.Start + this.PageSize;
-        //}
-        Start = this.Start + this.PageSize;
-        await LoadData(Start, PageSize);
-    }
-    protected async Task FirstPage(MouseEventArgs args)
-    {
-        Start = 0;
-        await LoadData(Start, PageSize);
-    }
-    protected async Task LastPage(MouseEventArgs args)
-    {
-        Start = this.Count - this.PageSize;
-        await LoadData(Start, PageSize);
-    }
     protected async Task Dropdown0Change(dynamic args)
     {
-        await LoadData(Start, PageSize);
+        LoadDataArgs lArgs = new LoadDataArgs()
+            {
+                Skip = Start,
+                Top = PageSize
+            };
+        await Grid0LoadData(lArgs);
+    }
+    protected async Task Search()
+    {
+        getFiltered = true;
+        LoadDataArgs lArgs = new LoadDataArgs()
+            {
+                Skip = Start,
+                Top = PageSize
+            };
+        pagechanged = false;
+        await Grid0LoadData(lArgs);
+    }
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+    protected async Task Reset()
+    {
+        getFiltered = false;
+        filterText = "";
+        dateNow = null;
+        Start = 0;
+        pagechanged = false;
+
+        Count = 0;
+        grid0.Reset();
+
+        filter = "f";
+        //authorsDataResult = await Task.Run(() => authorService.GetAll(Start, PageSize));
+        //authors = authorsDataResult.Authors;
+        //Count = authorsDataResult.Count;
+
+        await grid0.Reload();
     }
 }
