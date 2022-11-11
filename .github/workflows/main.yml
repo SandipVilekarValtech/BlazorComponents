@@ -25,7 +25,10 @@ jobs:
       
     - name: Build
       run: dotnet build --no-restore --configuration Release
-      
+    
+    - name: Run Automated tests
+      run: dotnet test -c Release --no-build
+    
     - name: Publish
       run: dotnet publish -f net6.0  -r win-x64 --configuration Release --output ./publish 
     
