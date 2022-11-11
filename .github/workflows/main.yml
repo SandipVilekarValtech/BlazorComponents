@@ -2,7 +2,7 @@ on:
   push:
     branches: [ "master" ]
   pull_request:
-    branches: none # [ "master" ]
+    branches: [ "master" ] # none
   
   workflow_dispatch:
   
