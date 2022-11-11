@@ -27,7 +27,7 @@ jobs:
       run: dotnet build --no-restore --configuration Release
       
     - name: Publish
-      run: dotnet publish -f net6.0  -r win-x64 --configuration Release --no-restore --output ./publish 
+      run: dotnet publish -f net6.0  -r win-x64 --configuration Release --output ./publish 
     
     #DEPLOYMENT
     - name: Deploy to IIS
