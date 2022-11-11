@@ -18,12 +18,13 @@ namespace BlazorComponents.Server.Controllers
             _authorRepository = authorRepository;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors(int skip = 0, int take = 5)
+        [HttpGet("GetAllAuthors")]
+        public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAllAuthors()
         {
             try
             {
-                return Ok(await _authorRepository.GetAll(skip, take));
+                var result = await _authorRepository.GetAllAuthors();
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -32,34 +33,49 @@ namespace BlazorComponents.Server.Controllers
             }
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult> GetAuthors(int skip = 0, int take = 5)
-        //{
-        //    try
-        //    {
-        //        var result = await _authorRepository.GetAll(skip, take);
-        //        return Ok(result);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError,
-        //            "Error fetching data");
-        //    }
-        //}
+        [HttpGet]
+        public async Task<ActionResult<DataModel.AuthorDataResult>> GetAuthors(int skip = 0, int take = 5)
+        {
+            try
+            {
+                var result = await _authorRepository.GetAll(skip, take);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error fetching data");
+            }
+        }
+        [HttpGet("GridSearch")]
+        public async Task<ActionResult<DataModel.AuthorDataResult>> GridSearch(string filterText, DateTime? filterDate, string filter, string orderBy, int skip = 0, int take = 5)
+        {
+            try
+            {
+                var result = await _authorRepository.GridSearch(filterText, filterDate, filter, orderBy, skip, take);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error fetching data");
+            }
+        }
 
-        //[HttpGet]
-        //public async Task<ActionResult> GetCount()
-        //{
-        //    try
-        //    {
-        //        return Ok(await _authorRepository.GetCount());
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError,
-        //            "Error fetching data");
-        //    }
-        //}
+        [HttpGet("Search")]
+        public async Task<ActionResult<DataModel.AuthorDataResult>> Search(string filter, DateTime? filterDate, int skip = 0, int take = 5)
+        {
+            try
+            {
+                var result = await _authorRepository.Search(filter, filterDate, skip, take);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Error fetching data");
+            }
+        }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Author>> GetAuthor(int id)

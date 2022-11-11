@@ -1,0 +1,36 @@
+﻿@page "/authorClientSide"
+@using BlazorComponents.Shared
+@inject IAuthorService authorService
+<PageTitle>Authors</PageTitle>
+
+<h3>Radzen Datagrid Client-side Pagination</h3>
+
+@if (authors == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <RadzenDataGrid Data="@authors"
+                TItem="AuthorDto"
+                PageSize="10"
+                AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" ShowPagingSummary="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="AuthorDto" Property="FirstName" Title="First Name" />
+            <RadzenDataGridColumn TItem="AuthorDto" Property="LastName" Title="Last Name" />
+            <RadzenDataGridColumn TItem="AuthorDto" Property="Email" Title="Email" />
+
+        </Columns>
+    </RadzenDataGrid>
+}
+
+@code {
+    public IEnumerable<AuthorDto> authors;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authors = await Task.Run(() => authorService.GetAllAuthors());
+    }
+
+}

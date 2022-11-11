@@ -1,0 +1,38 @@
+on:
+  push:
+    branches: [ "Dev" ]
+  pull_request:
+    branches: none # [ "master" ]
+  
+  workflow_dispatch:
+  
+  
+jobs:
+  build:
+
+    runs-on: VDC01LLAP6494-sandip
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+      
+      # dotnet restore build and publish      
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+      
+    - name: Publish
+      run: dotnet publish -f net6.0  -r win-x64 --configuration Release --no-restore --output ./publish 
+    
+    #DEPLOYMENT
+    - name: Deploy to IIS
+      run: |
+        echo Starting Deployment....
+        iisreset /stop
+        Copy-Item ./publish/* C:/inetpub/wwwroot/BlazorRadzenGrid2 -Recurse -Force
+        iisreset /start

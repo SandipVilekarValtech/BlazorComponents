@@ -8,7 +8,7 @@ namespace BlazorComponents.Shared
 {
     public class AuthorDto
     {
-        public short Id { get; set; }
+        public Int32 Id { get; set; }
 
         public string FirstName { get; set; } = null!;
 

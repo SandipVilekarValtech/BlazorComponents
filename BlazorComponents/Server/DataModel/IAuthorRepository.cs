@@ -1,13 +1,14 @@
 ﻿using BlazorComponents.Shared;
+using Radzen;
 
 namespace BlazorComponents.Server.DataModel
 {
     public interface IAuthorRepository
     {
-        Task<IEnumerable<Author>> GetAll(int skip, int take);
-        //Task<AuthorDataResult> GetAll(int skip, int take);
-        ////Task<int> GetCount();
-        Task<IEnumerable<Author>> Search(string firstName);
+        Task<AuthorDataResult> GetAll(int skip, int take);
+        Task<AuthorDataResult> GridSearch(string filterText, DateTime? filterDate, string filter, string orderBy, int skip = 0, int take = 5);
+        Task<AuthorDataResult> Search(string filter, DateTime? filterDate, int skip, int take);
+        Task<IEnumerable<Author>> GetAllAuthors();
         Task<Author> GetAuthor(int id);
         Task<Author> GetAuthorByEmail(string email);
     }
