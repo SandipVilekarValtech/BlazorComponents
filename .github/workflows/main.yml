@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ "Master" ]
+    branches: [ "master" ]
   pull_request:
     branches: none # "Master"
   
