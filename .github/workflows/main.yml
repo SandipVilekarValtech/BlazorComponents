@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [ "Dev" ]
+    branches: none #[ "master" ]
   pull_request:
-    branches: none
+    branches: "Master"
   
   workflow_dispatch:  
   
