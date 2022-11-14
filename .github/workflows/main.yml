@@ -28,6 +28,9 @@ jobs:
     - name: Run Automated tests
       run: dotnet test -c Release --no-build
     
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
     - uses: actions/checkout@v2
       with:
         # Disabling shallow clone is recommended for improving relevancy of reporting
