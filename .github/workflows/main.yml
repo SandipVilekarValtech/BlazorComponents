@@ -28,13 +28,12 @@ jobs:
     - name: Run Automated tests
       run: dotnet test -c Release --no-build
     
-    - name: Publish
-      run: dotnet publish -f net6.0  -r win-x64 --configuration Release --output ./publish 
-    
-    #DEPLOYMENT
-    - name: Deploy to IIS
-      run: |
-        echo Starting Deployment....
-        iisreset /stop
-        Copy-Item ./publish/* C:/inetpub/wwwroot/BlazorRadzenGrid2 -Recurse -Force
-        iisreset /start
+    - uses: actions/checkout@v2
+      with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+    - name: SonarCloud Scan
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
