@@ -1,9 +1,10 @@
 on:
   push:
-    branches: [ "master" ]
+    branches: nne #[ "master" ]
   pull_request:
-    branches: none # "Master"
-  
+    #branches: none # "Master"
+    types: [opened, synchronize, reopened]
+    
   workflow_dispatch:  
   
 jobs:
