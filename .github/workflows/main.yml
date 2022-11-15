@@ -8,7 +8,7 @@ on:
   workflow_dispatch:  
   
 jobs:
-  build:
+  BuildPublishAndDeploy:
 
     runs-on: VDC01LLAP6494-sandip
 
