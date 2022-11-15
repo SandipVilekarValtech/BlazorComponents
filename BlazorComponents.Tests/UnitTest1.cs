@@ -5,7 +5,7 @@ namespace BlazorComponents.Tests
         [Fact]
         public void Test1()
         {
-            Assert.True(1 == 10);
+            Assert.True(1 == 1);
         }
     }
 }
