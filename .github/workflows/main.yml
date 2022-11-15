@@ -1,6 +1,6 @@
 on:
   push:
-    branches: nne #[ "master" ]
+    branches: none #[ "master" ]
   pull_request:
     #branches: none # "Master"
     types: [opened, synchronize, reopened]
